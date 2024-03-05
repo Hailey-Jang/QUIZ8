@@ -1,0 +1,64 @@
+---
+title: "Quiz 8"
+author: "Hailey Jang"
+format: html
+---
+
+# Set random seed for reproducibility
+np.random.seed(0)
+
+# Simulate the dataset
+n = 1000
+age_groups = np.random.choice(['18-25', '26-35', '36-45', '46-55', '56+'], n)
+genders = np.random.choice(['Male', 'Female', 'Other'], n)
+income_groups = np.random.choice(['Low', 'Middle', 'High'], n)
+education_levels = np.random.choice(['High School', 'Bachelor\'s', 'Master\'s', 'PhD'], n)
+p1 = np.random.normal(0, 1, n)  # Numerical predictor 1
+p2 = np.random.normal(5, 2, n)  # Numerical predictor 2
+p3 = np.random.choice(['Region1', 'Region2', 'Region3'], n)  # Categorical predictor
+
+# Assume a simple model for support, combining these predictors
+logit = p1 - 0.5*p2 + (age_groups == '18-25').astype(int) + (genders == 'Female').astype(int) * 1.5
+logit += (income_groups == 'High').astype(int) * 2 + (education_levels == 'PhD').astype(int) * 1.2
+probability = 1 / (1 + np.exp(-logit))
+support = np.random.binomial(1, probability)
+
+# Create DataFrame
+data = pd.DataFrame({
+    'Support': support,
+    'Age_Group': age_groups,
+    'Gender': genders,
+    'Income_Group': income_groups,
+    'Highest_Education': education_levels,
+    'P1': p1,
+    'P2': p2,
+    'P3': p3
+})
+
+# Sample tests on the simulated data
+
+# Test 1: Proportion of support across different age groups
+support_age_group = data.groupby('Age_Group')['Support'].mean()
+
+# Test 2: Association between gender and support
+support_gender = data.groupby('Gender')['Support'].mean()
+
+# Test 3: Influence of income group on support
+support_income = data.groupby('Income_Group')['Support'].mean()
+
+# Test 4: Impact of education level on political support
+support_education = data.groupby('Highest_Education')['Support'].mean()
+
+# Test 5-7: Logistic regression (considering P1, P2, and P3 as predictors)
+# Encoding categorical variables for regression
+data_encoded = pd.get_dummies(data, columns=['Age_Group', 'Gender', 'Income_Group', 'Highest_Education', 'P3'])
+log_reg = LogisticRegression()
+log_reg.fit(data_encoded.drop('Support', axis=1), data_encoded['Support'])
+regression_coefficients = log_reg.coef_
+
+# Test 8-10: Chi-square tests for independence between categorical variables and support
+chi2_age = chi2_contingency(pd.crosstab(data['Support'], data['Age_Group']))
+chi2_gender = chi2_contingency(pd.crosstab(data['Support'], data['Gender']))
+chi2_income = chi2_contingency(pd.crosstab(data['Support'], data['Income_Group']))
+
+support_age_group, support_gender, support_income, support_education, regression_coefficients, chi2_age[1], chi2_gender[1], chi2_income[1]
