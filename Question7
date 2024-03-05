@@ -1,0 +1,25 @@
+---
+title: "Quiz8-Question7"
+author: "Hailey Jang"
+format: html
+---
+
+```{r}
+set.seed(123)
+
+n <- 100  # Number of observations
+earth <- rnorm(n, mean = 50, sd = 10)
+fire <- rnorm(n, mean = 30, sd = 5)
+wind <- rnorm(n, mean = 20, sd = 4)
+water <- rnorm(n, mean = 40, sd = 7)
+```
+```{r}
+heart <- 5 + 1.5*earth + 2*fire - 1.2*wind + 0.8*water + rnorm(n, mean = 0, sd = 5)
+
+data <- data.frame(earth, fire, wind, water, heart)
+
+# Fit a linear regression model
+model <- lm(heart ~ earth + fire + wind + water, data = data)
+
+summary(model)
+```
