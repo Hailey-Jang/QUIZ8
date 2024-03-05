@@ -4,36 +4,23 @@ author: "Hailey Jang"
 format: html
 ---
 
-# Set random seed for reproducibility
-np.random.seed(0)
+library(tidyverse)
 
-# Simulate the dataset
-n = 1000
-age_groups = np.random.choice(['18-25', '26-35', '36-45', '46-55', '56+'], n)
-genders = np.random.choice(['Male', 'Female', 'Other'], n)
-income_groups = np.random.choice(['Low', 'Middle', 'High'], n)
-education_levels = np.random.choice(['High School', 'Bachelor\'s', 'Master\'s', 'PhD'], n)
-p1 = np.random.normal(0, 1, n)  # Numerical predictor 1
-p2 = np.random.normal(5, 2, n)  # Numerical predictor 2
-p3 = np.random.choice(['Region1', 'Region2', 'Region3'], n)  # Categorical predictor
+set.seed(123) 
 
-# Assume a simple model for support, combining these predictors
-logit = p1 - 0.5*p2 + (age_groups == '18-25').astype(int) + (genders == 'Female').astype(int) * 1.5
-logit += (income_groups == 'High').astype(int) * 2 + (education_levels == 'PhD').astype(int) * 1.2
-probability = 1 / (1 + np.exp(-logit))
-support = np.random.binomial(1, probability)
+# Simulate data
+n <- 1000
+age_group <- sample(1:3, n, replace = TRUE)
+income_group <- sample(1:3, n, replace = TRUE)
+highest_education <- sample(1:3, n, replace = TRUE)
 
-# Create DataFrame
-data = pd.DataFrame({
-    'Support': support,
-    'Age_Group': age_groups,
-    'Gender': genders,
-    'Income_Group': income_groups,
-    'Highest_Education': education_levels,
-    'P1': p1,
-    'P2': p2,
-    'P3': p3
-})
+logit_p <- -0.5 + 0.2 * age_group + 0.15 * income_group + 0.1 * highest_education
+prob <- exp(logit_p) / (1 + exp(logit_p))
+support <- rbinom(n, 1, prob)
+
+data <- data.frame(support, age_group, income_group, highest_education)
+
+head(data)
 
 # Sample tests on the simulated data
 
